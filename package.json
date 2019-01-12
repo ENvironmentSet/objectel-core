@@ -1,0 +1,41 @@
+{
+  "name": "objectel",
+  "version": "0.0.0",
+  "description": "description",
+  "index": "index.js",
+  "main": "build/lib/objectel.js",
+  "unpkg": "build/dist/objectel.js",
+  "module": "build/es/objectel.js",
+  "keywords": [],
+  "scripts": {
+    "env:development": "cross-env NODE_ENV=development",
+    "env:production": "cross-env NODE_ENV=production",
+    "build": "rollup -c",
+    "build:development": "npm run env:development -- npm run build",
+    "build:production": "npm run env:production -- npm run build",
+    "clear": "rimraf build",
+    "release": "npm run clear -- npm run build:production -- npm run publish"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ENvironmentSet/objectel.git"
+  },
+  "author": "ENvironmentSet <herryseo1@gmail.com> (https://github.com/ENvironmentSet)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ENvironmentSet/objectel/issues"
+  },
+  "homepage": "https://github.com/ENvironmentSet/objectel#readme",
+  "devDependencies": {
+    "@babel/cli": "^7.2.3",
+    "@babel/core": "^7.2.2",
+    "@babel/preset-env": "^7.2.3",
+    "babel-loader": "^8.0.5",
+    "cross-env": "^5.2.0",
+    "rimraf": "^2.6.3",
+    "rollup": "^1.1.0",
+    "rollup-plugin-babel": "^4.3.0",
+    "rollup-plugin-node-resolve": "^4.0.0"
+  },
+  "dependencies": {}
+}

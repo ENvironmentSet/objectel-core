@@ -1,20 +1,24 @@
 {
   "name": "objectel",
-  "version": "0.0.0",
-  "description": "description",
+  "version": "0.1.0",
+  "description": "provides api to manipulate highly-abstracted object in order to resolve hierarchical problem via composition",
   "index": "index.js",
   "main": "build/lib/objectel.js",
   "unpkg": "build/dist/objectel.js",
   "module": "build/es/objectel.js",
-  "keywords": [],
+  "keywords": [
+    "reactive programming"
+  ],
   "scripts": {
     "env:development": "cross-env NODE_ENV=development",
     "env:production": "cross-env NODE_ENV=production",
+    "env:test": "cross-env NODE_ENV=test",
     "build": "rollup -c",
     "build:development": "npm run env:development -- npm run build",
     "build:production": "npm run env:production -- npm run build",
     "clear": "rimraf build",
-    "release": "npm run clear -- npm run build:production -- npm run publish"
+    "release": "npm run clear -- npm run build:production -- npm run publish",
+    "test": "npm run env:test -- jest"
   },
   "repository": {
     "type": "git",
@@ -30,12 +34,17 @@
     "@babel/cli": "^7.2.3",
     "@babel/core": "^7.2.2",
     "@babel/preset-env": "^7.2.3",
-    "babel-loader": "^8.0.5",
     "cross-env": "^5.2.0",
     "rimraf": "^2.6.3",
     "rollup": "^1.1.0",
     "rollup-plugin-babel": "^4.3.0",
     "rollup-plugin-node-resolve": "^4.0.0"
   },
-  "dependencies": {}
+  "dependencies": {
+    "babel-core": "^7.0.0-bridge.0",
+    "callbag-map": "^1.0.1",
+    "callbag-merge": "^3.1.0",
+    "callbag-pipe": "^1.1.1",
+    "jest": "^23.6.0"
+  }
 }

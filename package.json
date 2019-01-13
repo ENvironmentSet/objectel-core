@@ -34,6 +34,8 @@
     "@babel/cli": "^7.2.3",
     "@babel/core": "^7.2.2",
     "@babel/preset-env": "^7.2.3",
+    "babel-core": "^7.0.0-bridge.0",
+    "jest": "^23.6.0",
     "cross-env": "^5.2.0",
     "rimraf": "^2.6.3",
     "rollup": "^1.1.0",
@@ -41,10 +43,8 @@
     "rollup-plugin-node-resolve": "^4.0.0"
   },
   "dependencies": {
-    "babel-core": "^7.0.0-bridge.0",
     "callbag-map": "^1.0.1",
     "callbag-merge": "^3.1.0",
-    "callbag-pipe": "^1.1.1",
-    "jest": "^23.6.0"
+    "callbag-pipe": "^1.1.1"
   }
 }

@@ -6,31 +6,7 @@ provides api to manipulate highly-abstracted object in order to resolve hierarch
 
 ### Component
 
-Example: Simple counter
-
-```js
-import * as Ol from 'objectel';
-import map from 'callbag-map';
-import { compose } from 'ramda'
-
-const ReactiveCounter = Ol.ReactiveComponent(
-  Ol.Event.ofType('click'), // event$ => intent$
-  Ol.fromIntent(prevModel => prevModel + 1, 0), // $intent => model$
-  map(model => Ol.Element('p', null, model)), // $model => result$
-);
-const ReactiveCounterTakesProp = Ol.ReactiveComponent(props => compose(
-  Ol.Event.ofType('click'),
-  Ol.fromIntent(prevModel => prevModel + props.count, props.startValue),
-  map(model => Ol.Element('p', null, model)),
-));
-const Counter = Ol.Component(
-  props => props.startValue,
-  (model, props) => Ol.Element('p', null, model),
-  {
-    click: (prevModel, props) => prevModel + props.count,
-  },
-);
-```
+Unit of entity that resolves problem
 
 #### Ol.Element(component, props, children, [event$])
 

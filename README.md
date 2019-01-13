@@ -1,23 +1,71 @@
 # objectel
 
-provides api to manipulate highly-abstracted object in order to resolve hierarchical problem via composition
+![LICENSE](https://img.shields.io/npm/l/objectel.svg)
+![DOWNLOADS](https://img.shields.io/npm/dt/objectel.svg)
+![GITHUB-STARS](https://img.shields.io/github/stars/ENvironmentSet/objectel.svg)
+![LAST-COMMIT](https://img.shields.io/github/last-commit/ENvironmentSet/objectel.svg)
+
+objectel is library which provides highly-abstracted object in order to resolve hierarchical problem via composition
+
+objectel uses few un-popular mindset which is called [callbag](https://github.com/callbag/callbag)
+I just told you "callbag is unpopular mindset". but don't think callbag badly, it is awesome standard.
+if you overcome some complexity of callbag, then you may find yourself in 'callbag haven'.
+
+here is some good articles about callbag, if you doesn't friendly with callbag, you will do better to read these articles.
+
+[callbag standard](https://github.com/callbag/callbag)  
+[why we need callbag?](https://staltz.com/why-we-need-callbags.html)  
+[callbag introduction](http://blog.krawaller.se/posts/callbags-introduction/)  
+
+this article does not related to callbag, but I believe this is one of best article in reactive programming's history
+[introduction to reactive programming](https://gist.github.com/staltz/868e7e9bc2a7b8c1f754)
 
 ## API
 
 ### Component
 
-Unit of entity that resolves problem
+**Component is the unit of problem.**
 
-#### Ol.Element(component, props, children, [event$])
+every complex problem could be split into several less-complex problem(also known as divide and conquer).
+objectel suggest to use component at dividing problem.
+
+anyway, in viewpoint of library, every component is a function that takes `props` and returns a function which input is stream(callbag) of event and output is stream of result.
+
+also, instant of component is called **element**
+#### Ol.createElement(type, props, children)
+
+| Arguments | Description |
+|-----------|-------------|
+| type | a string |
+| props | a object or `null` |
+| children | any value, will be settled to `props.children`. |
+
+* returns listenable that emit `{ type, props: {...props, children} }` once.
+
+Example
+
+Creating a simple element
+
+```js
+import * as Ol from 'objectel';
+import forEach from 'callbag-for-each';
+
+forEach(console.log)(Ol.createElement('a', { herf: 'somewhere' }, 'go!'))
+// logs { type: 'a', { herf: 'somewhere', children: 'go!' } }
+```
+
+#### Ol.createElement(component, props, children, [event$])
 
 | Arguments | Description |
 |-----------|-------------|
 | component | a component |
-| props | an object that provides information to component, or null |
-| children | value which will be settled to `props.children`, could be anything except boolean or falsy value |
-| event$ | stream of event, if this slot is omitted, `props.event$`'s value will be event$. if not, this value will be settled to `props.event$` |
+| props | a object or `null`, will be applied to component when `createElement` creates instance of component. |
+| children | any value, will be settled to `props.children`. |
+| event$ | listenable that produces event, used as source of component. if `event$` is omitted, `props.event$` will be replaced `event$`'s place. |
 
 * returns stream of results
+
+`createElement` is function that creates element of given component.
 
 Examples
 
@@ -25,15 +73,19 @@ Simple Counter
 
 ```js
 import * as Ol from 'objectel';
-import Counter from './counter';// let's say we have a counter
+import interval from 'callbag-interval';
+import pipe from 'callbag-pipe';
+import forEach from 'callbag-for-each';
 
-const globalBus = Ol.createEventBus(Ol.Event('increase'));
-const counter = Ol.createElement(Counter, globalBus.Listener$);
+const Timer = ({ startTime }) => _ => pipe(
+  interval(1000),
+  Ol.operators.reduce(leftTime => leftTime - 1, startTime)
+);
+const timer = Ol.createElement(Timer, { startTime: 10 });
+forEach(console.log)(timer); // logs 10 9 8 7 ...
 ```
 
-* returns stream of results
-
-#### Ol.ReactiveComponent(intent$, model$, result$)
+#### Ol.reactiveComponent(intent$, model$, result$)
 
 | Arguments | Description |
 |-----------|-------------|
@@ -43,11 +95,7 @@ const counter = Ol.createElement(Counter, globalBus.Listener$);
 
 * returns newly created component
 
-#### Ol.ReactiveComponent(componentFactory)
-
-| Arguments | Description |
-|-----------|-------------|
-| componentFactory | takes props as argument, result function which takes stream of event as argument and returns stream of results |
+`reactiveComponent` creates a component by combining given streams.
 
 Examples
 
@@ -57,12 +105,22 @@ Simple Counter Component without prop binding
 import * as Ol from 'objectel';
 import map from 'callbag-map';
 
-const ReactiveCounter = Ol.ReactiveComponent(
-  Ol.Event.ofType('increase'),
-  Ol.fromIntent(prevModel => prevModel + 1, 0),
-  map(model => Ol.Element('p', null, model)),
+const Counter = Ol.reactiveComponent(
+  Ol.operators.ofType('increase'),
+  Ol.operators.reduce(prevModel => prevModel + 1, 0),
+  map(model => Ol.createElement('text', null, model)),
 );
 ```
+
+#### Ol.reactiveComponent(componentFactory)
+
+| Arguments | Description |
+|-----------|-------------|
+| componentFactory | takes `props` as argument, returns a function which takes stream of event as argument and returns stream of results |
+
+* returns newly created component
+
+Examples
 
 Simple Counter Component with prop binding
 
@@ -70,20 +128,20 @@ Simple Counter Component with prop binding
 import * as Ol from 'objectel';
 import map from 'callbag-map';
 
-const ReactiveCounterTakesProp = Ol.ReactiveComponent(({ count, startValue}) => compose(
-  Ol.Event.ofType('increase'),
-  Ol.fromIntent(prevModel => prevModel + count, startValue),
-  map(model => Ol.Element('p', null, model)),
+const Counter = Ol.reactiveComponent(({ count, startValue}) => compose(
+  Ol.operators.ofType('increase'),
+  Ol.operators.reduce(prevModel => prevModel + count, startValue),
+  map(model => Ol.createElement('text', null, model)),
 ));
 ```
 
-#### Ol.Component(propsToModel, modelToResult, [eventMap])
+#### Ol.component(propsToModel, modelToResult, [eventMap])
 
 | Arguments | Description |
 |-----------|-------------|
 | propsToModel | takes props as argument and returns model |
 | modelToResult | takes model as argument and returns result, this function will be called every time model is changed |
-| eventMap | object that properties name are event name and value of those property is function that takes previous model and props as argument and returns new model
+| eventMap | object that it's property's name are event name and value of it is a function that takes payload of event, props, previous model as argument and returns new model
 
 * returns newly created component
 
@@ -94,18 +152,19 @@ Simple Counter Component
 ```js
 import * as Ol from 'objectel';
 
-const Counter = Ol.Component(
+const Counter = Ol.component(
   props => props.startValue,
-  model => Ol.Element('p', null, model),
+  model => Ol.createElement('text', null, model),
   {
-    increase: (prevModel, { count }) => prevModel + count,
+    increase: (payload, props, prevModel) => prevModel + props.count * payload,
   },
 );
 ```
 
 #### Ol.Fragment
 
-Component to wrap several component into one
+fragment is a component that merges it's children's result stream into one.
+usually used to compose several component into one.
 
 Examples
 
@@ -126,11 +185,12 @@ const App = Ol.createElement(
 );
 ```
 
-#### Ol.fromIntent(reducer)
+#### Ol.operators.reduce(reducer, [preloadedModel])
 
 | Arguments | Description |
 |-----------|-------------|
-| reducer | takes previous model and props as argument and returns new model |
+| reducer | takes previous model and a event as argument and returns new model |
+| preloadedModel | model which will be used to initialize result stream. |
 
 Examples
 
@@ -140,30 +200,33 @@ Simple Counter Component
 import * as Ol from 'objectel';
 import map from 'callbag-map';
 
-const ReactiveCounter = Ol.ReactiveComponent(
-  Ol.Event.ofType('increase'),
-  Ol.fromIntent(prevModel => prevModel + 1, 0),
-  map(model => Ol.Element('p', null, model)),
+const Counter = Ol.reactiveComponent(
+  Ol.operators.ofType('increase'),
+  Ol.operators.reduce(prevModel => prevModel + 1, 0),
+  map(model => Ol.createElement('text', null, model)),
 );
 ```
 
 #### Functional Component
 
-function that takes props(or nothing) and returns stream of results is Functional Component
+function that takes props(or nothing) and returns element
 
 Example
 
 Simple Timer Component
 
 ```js
-import pipe from 'callbag-pipe';
+import * as Ol from 'objectel';
 import interval from 'callbag-interval';
-import scan from 'callbag-map';
+import pipe from 'callbag-pipe';
+import forEach from 'callbag-for-each';
 
-const Timer = ({ startTime }) => pipe(
+const Timer = ({ startTime }) => _ => pipe(
   interval(1000),
-  scan(prevTime => prevTime + 1, startTime),
+  Ol.operators.reduce(leftTime => leftTime - 1, startTime)
 );
+const timer = Ol.createElement(Timer, { startTime: 10 });
+forEach(console.log)(timer); // logs 10 9 8 7 ...
 ```
 
 ### Event
@@ -205,35 +268,19 @@ Simple Counter
 import * as Ol from 'objectel';
 import Counter from './counter';// let's say we have a counter
 
-const globalBus = Ol.createEventBus(Ol.Event('increase'));
+const globalBus = Ol.createEventBus(Ol.createEvent('increase'));
 const counter = Ol.createElement(Counter, globalBus.Listener$);
 ```
 
-#### EventBus.Listener$
+#### EventBus.Listen$
 
 stream of events of EventBus
 
-#### EventBus.Emitter$
+#### EventBus.Emit$
 
 sink of EventBus that expected to be delivered events
 
-#### EventBus.Emit(event$)
-
-| Arguments | Description |
-|-----------|-------------|
-| event$ | stream of events |
-
-emits each event in event$ in EventBus
-
-#### EventBus.Listen(listener)
-
-| Arguments | Description |
-|-----------|-------------|
-| listener | function that takes event as argument |
-
-listen every emitted event in EventBus with listener
-
-#### Event.ofType(type)
+#### Ol.operators.ofType(type)
 
 | Arguments | Description |
 |-----------|-------------|
@@ -249,4 +296,3 @@ If you are trying to use Ol, you don't need to read this part.
 this part describes interface of `Element` in Ol.
 
 Each `Element` is pullable which takes event and produces result.
-Each `Element` has property of global symbol `olElement` and it's value is `true`.

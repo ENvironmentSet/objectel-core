@@ -20,6 +20,7 @@ export default function createElement(
   ...children
 ) {
   if (props == null) props = {};
+  if (children.length === 1) children = children[0];
 
   return typeof component !== 'function' ?
     createStructuralElement(component, props, children)

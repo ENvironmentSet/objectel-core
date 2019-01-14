@@ -9,7 +9,6 @@ function createStructuralElement(type, props, children) {
 
 function createReactiveElement(component, props, children) {
   const componentFactory = component(props);
-  if (props === null) props = {};
   props.children = children;
 
   return componentFactory;
@@ -20,6 +19,8 @@ export default function createElement(
   props,
   ...children
 ) {
+  if (props == null) props = {};
+
   return typeof component !== 'function' ?
     createStructuralElement(component, props, children)
     :

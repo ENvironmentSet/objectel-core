@@ -1,25 +1,27 @@
-import { voidSource, once } from './utils';
-import pipe from 'callbag-pipe';
+import { once } from './utils';
 
 function createStructuralElement(type, props, children) {
-  return once({
+  return () => once({
     type,
     props: { ...props, children },
   });
 }
 
+function createReactiveElement(component, props, children) {
+  const componentFactory = component(props);
+  if (props === null) props = {};
+  props.children = children;
+
+  return componentFactory;
+}
+
 export default function createElement(
   component,
   props,
-  children,
-  event$ = props && props.event$ || voidSource
+  ...children
 ) {
-  if (typeof component !== 'function') return createStructuralElement(component, props, children);
-  if (props === null) props = {};
-  props.event$ = event$;
-  props.children = children;
-  return pipe(
-    event$,
-    component(props),
-  );
+  return typeof component !== 'function' ?
+    createStructuralElement(component, props, children)
+    :
+    createReactiveElement(component, props, children);
 }

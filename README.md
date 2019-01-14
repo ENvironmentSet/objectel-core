@@ -9,7 +9,7 @@ objectel is library which provides highly-abstracted object in order to resolve 
 
 objectel uses few un-popular mindset which is called [callbag](https://github.com/callbag/callbag)
 I just told you "callbag is unpopular mindset". but don't think callbag badly, it is awesome standard.
-if you overcome some complexity of callbag, then you may find yourself in 'callbag haven'.
+if you overcome some complexity of callbag, then you may find yourself in 'callbag heaven'.
 
 here is some good articles about callbag, if you doesn't friendly with callbag, you will do better to read these articles.
 
@@ -29,7 +29,7 @@ this article does not related to callbag, but I believe this is one of best arti
 every complex problem could be split into several less-complex problem(also known as divide and conquer).
 objectel suggest to use component at dividing problem.
 
-anyway, in viewpoint of library, every component is a function that takes `props` and returns a function which input is stream(callbag) of event and output is stream of result.
+anyway, in viewpoint of library, every component is a function that takes `props` and returns a function which takes stream(callbag) of event and returns listenable callbag of result(also known as **element**).
 
 also, instant of component is called **element**
 #### Ol.createElement(type, props, children)
@@ -54,16 +54,15 @@ forEach(console.log)(Ol.createElement('a', { herf: 'somewhere' }, 'go!'))
 // logs { type: 'a', { herf: 'somewhere', children: 'go!' } }
 ```
 
-#### Ol.createElement(component, props, children, [event$])
+#### Ol.createElement(component, props, ...children)
 
 | Arguments | Description |
 |-----------|-------------|
 | component | a component |
 | props | a object or `null`, will be applied to component when `createElement` creates instance of component. |
 | children | any value, will be settled to `props.children`. |
-| event$ | listenable that produces event, used as source of component. if `event$` is omitted, `props.event$` will be replaced `event$`'s place. |
 
-* returns stream of results
+* returns a function which takes stream of event and returns stream of results
 
 `createElement` is function that creates element of given component.
 
@@ -110,29 +109,6 @@ const Counter = Ol.reactiveComponent(
   Ol.operators.reduce(prevModel => prevModel + 1, 0),
   map(model => Ol.createElement('text', null, model)),
 );
-```
-
-#### Ol.reactiveComponent(componentFactory)
-
-| Arguments | Description |
-|-----------|-------------|
-| componentFactory | takes `props` as argument, returns a function which takes stream of event as argument and returns stream of results |
-
-* returns newly created component
-
-Examples
-
-Simple Counter Component with prop binding
-
-```js
-import * as Ol from 'objectel';
-import map from 'callbag-map';
-
-const Counter = Ol.reactiveComponent(({ count, startValue}) => compose(
-  Ol.operators.ofType('increase'),
-  Ol.operators.reduce(prevModel => prevModel + count, startValue),
-  map(model => Ol.createElement('text', null, model)),
-));
 ```
 
 #### Ol.component(propsToModel, modelToResult, [eventMap])
@@ -248,7 +224,7 @@ Simple Event
 ```js
 import * as Ol from 'objectel';
 
-const myEvent = Ol.Event('increase', 10, { by: 'click' });
+const myEvent = Ol.createEvent('increase', 10, { by: 'click' });
 // { type: 'increase', payload: 10, meta: { by: 'click' } };
 ```
 
@@ -269,7 +245,7 @@ import * as Ol from 'objectel';
 import Counter from './counter';// let's say we have a counter
 
 const globalBus = Ol.createEventBus(Ol.createEvent('increase'));
-const counter = Ol.createElement(Counter, globalBus.Listener$);
+const counter = Ol.createElement(Counter)(globalBus.Listen$);
 ```
 
 #### EventBus.Listen$
@@ -295,4 +271,4 @@ filters stream of event
 If you are trying to use Ol, you don't need to read this part.
 this part describes interface of `Element` in Ol.
 
-Each `Element` is pullable which takes event and produces result.
+Each `Element` is a function which takes stream of event and returns listenable which produces result.

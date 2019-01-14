@@ -43,6 +43,7 @@
     "rollup-plugin-node-resolve": "^4.0.0"
   },
   "dependencies": {
+    "callbag-flatten": "^1.2.0",
     "callbag-map": "^1.0.1",
     "callbag-merge": "^3.1.0",
     "callbag-pipe": "^1.1.1"

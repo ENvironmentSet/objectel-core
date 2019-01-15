@@ -1,6 +1,6 @@
 {
   "name": "objectel",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "provides api to manipulate highly-abstracted object in order to resolve hierarchical problem via composition",
   "index": "index.js",
   "main": "build/lib/objectel.js",

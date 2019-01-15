@@ -8,10 +8,9 @@ function createStructuralElement(type, props, children) {
 }
 
 function createReactiveElement(component, props, children) {
-  const componentFactory = component(props);
   props.children = children;
 
-  return componentFactory;
+  return component(props);
 }
 
 export default function createElement(

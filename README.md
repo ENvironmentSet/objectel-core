@@ -66,6 +66,8 @@ forEach(console.log)(Ol.createElement('a', { herf: 'somewhere' }, 'go!'))
 
 `createElement` is function that creates element of given component.
 
+if `children` is one-length array, it will be unwrapped and settled to `props.children`
+
 Examples
 
 Simple Counter

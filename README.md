@@ -213,7 +213,7 @@ forEach(console.log)(timer); // logs 10 9 8 7 ...
 
 ### Event
 
-#### Ol.Event(type, payload, [meta])
+#### Ol.createEvent(type, payload, [meta])
 
 | Arguments | Description |
 |-----------|-------------|

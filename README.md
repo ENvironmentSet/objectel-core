@@ -26,6 +26,8 @@ Anyway, If you can read korean, I have my blog post for you.
 
 ## API
 
+> **WARNING**: some of this api document are outdated. new api document will be added soon
+
 ### Component
 
 **Component is the unit of problem.**
